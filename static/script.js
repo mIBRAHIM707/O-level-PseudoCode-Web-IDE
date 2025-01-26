@@ -1,4 +1,3 @@
-
 document.querySelector('#pseudocode-form button').addEventListener('click', async function() {
     const pseudocode = document.getElementById('pseudocode').value;
     const response = await fetch('/compile', {
@@ -9,5 +8,6 @@ document.querySelector('#pseudocode-form button').addEventListener('click', asyn
         body: JSON.stringify({ pseudocode })
     });
     const result = await response.json();
+    console.log("Received result:", result); // Add this line for debugging
     document.getElementById('output').textContent = result.output || result.error;
 });

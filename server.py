@@ -25,6 +25,8 @@ def compile_code():
         python_file = compile_pseudocode_to_python(pseudocode)
         result = subprocess.run(['python3', python_file], capture_output=True, text=True)
         app.logger.debug(f"Execution result: {result.stdout}, Error: {result.stderr}")
+        if result.returncode != 0:
+            raise Exception(result.stderr)
         return jsonify({'output': result.stdout, 'error': result.stderr})
     except Exception as e:
         error_message = str(e)
@@ -32,6 +34,7 @@ def compile_code():
         if os.path.exists("error.log"):
             with open("error.log", "r") as error_file:
                 error_message = error_file.read()
+            app.logger.debug(f"Read error message from error.log: {error_message}")
         return jsonify({'output': '', 'error': error_message})
 
 def compile_pseudocode_to_python(pseudocode):
