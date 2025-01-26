@@ -18,7 +18,7 @@ def read_pseudocode(file_path):
 def main():
     parser = argparse.ArgumentParser(description="O-Level Pseudocode Compiler")
     parser.add_argument("pseudocode_file", help="Path to the pseudocode (.psc) file")
-    parser.add_argument("output_file", help="Path to the output Python (.py) file", nargs='?', default="generatedCode.py")
+    parser.add_argument("output_file", help="Path to the output Python (.py) file")
     args = parser.parse_args()
 
     pseudocode = read_pseudocode(args.pseudocode_file)

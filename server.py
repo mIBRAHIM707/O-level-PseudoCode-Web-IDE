@@ -16,6 +16,11 @@ def index():
 def compile_code():
     pseudocode = request.json.get('pseudocode')
     app.logger.debug(f"Received pseudocode: {pseudocode}")
+    
+    # Clear the error.log file
+    if os.path.exists("error.log"):
+        os.remove("error.log")
+    
     try:
         python_file = compile_pseudocode_to_python(pseudocode)
         result = subprocess.run(['python3', python_file], capture_output=True, text=True)
