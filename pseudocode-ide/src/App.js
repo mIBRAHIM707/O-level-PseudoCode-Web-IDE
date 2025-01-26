@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [pseudocode, setPseudocode] = useState('');
+    const [output, setOutput] = useState('');
+
+    const handleRun = async () => {
+        try {
+            const response = await axios.post('http://localhost:5000/compile', { pseudocode });
+            setOutput(response.data);
+        } catch (error) {
+            setOutput(error.response.data);
+        }
+    };
+
+    return (
+        <div className="App">
+            <h1>Pseudocode IDE</h1>
+            <textarea
+                value={pseudocode}
+                onChange={(e) => setPseudocode(e.target.value)}
+                placeholder="Write your pseudocode here..."
+            />
+            <button onClick={handleRun}>Run</button>
+            <pre>{output}</pre>
+        </div>
+    );
 }
 
 export default App;
