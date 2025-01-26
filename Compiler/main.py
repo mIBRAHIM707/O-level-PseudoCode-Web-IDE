@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'srcFiles'))
 
@@ -17,6 +18,7 @@ def read_pseudocode(file_path):
 def main():
     parser = argparse.ArgumentParser(description="O-Level Pseudocode Compiler")
     parser.add_argument("pseudocode_file", help="Path to the pseudocode (.psc) file")
+    parser.add_argument("output_file", help="Path to the output Python (.py) file", nargs='?', default="generatedCode.py")
     args = parser.parse_args()
 
     pseudocode = read_pseudocode(args.pseudocode_file)
@@ -36,15 +38,20 @@ def main():
         generator.generate(optimized_ast)
         target_code = generator.get_code()
 
-        with open("generatedCode.py", "w") as code_file:
+        with open(args.output_file, "w") as code_file:
             code_file.write(target_code)
 
-        os.system("python3 generatedCode.py")
+        # Execute the generated Python code and capture any runtime errors
+        result = subprocess.run(['python3', args.output_file], capture_output=True, text=True)
+        if result.returncode != 0:
+            raise Exception(result.stderr)
 
     except SyntaxError:
-        print("Syntax error in the pseudocode.")
+        with open("error.log", "w") as error_file:
+            error_file.write("Syntax error in the pseudocode.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        with open("error.log", "w") as error_file:
+            error_file.write(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
