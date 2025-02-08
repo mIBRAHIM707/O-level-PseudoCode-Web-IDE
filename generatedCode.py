@@ -1,6 +1,3 @@
-x = 15
+x = 4
 x = input()
-def square(n):
-    return (n * n)
-x = square(5)
 print(x)
