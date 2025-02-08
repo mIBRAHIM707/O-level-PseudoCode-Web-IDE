@@ -1,4 +1,6 @@
-x = 2
-for i in range(1, 5000 + 1):
-    x = (x + i)
-    print(x)
+x = 15
+x = input()
+def square(n):
+    return (n * n)
+x = square(5)
+print(x)

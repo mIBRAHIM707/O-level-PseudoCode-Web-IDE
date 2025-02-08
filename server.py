@@ -15,7 +15,8 @@ def index():
 @app.route('/compile', methods=['POST'])
 def compile_code():
     pseudocode = request.json.get('pseudocode')
-    app.logger.debug(f"Received pseudocode: {pseudocode}")
+    input_data = request.json.get('input_data', '')  # Get input data from request
+    app.logger.debug(f"Received pseudocode: {pseudocode}, input: {input_data}")
     
     # Clear the error.log file
     if os.path.exists("error.log"):
@@ -23,7 +24,7 @@ def compile_code():
     
     try:
         python_file = compile_pseudocode_to_python(pseudocode)
-        result = subprocess.run(['python3', python_file], capture_output=True, text=True)
+        result = subprocess.run(['python3', python_file], input=input_data, capture_output=True, text=True) # Pass input to subprocess
         app.logger.debug(f"Execution result: {result.stdout}, Error: {result.stderr}")
         if result.returncode != 0:
             raise Exception(result.stderr)
@@ -31,11 +32,12 @@ def compile_code():
     except Exception as e:
         error_message = str(e)
         app.logger.error(f"Exception: {error_message}")
-        if os.path.exists("error.log"):
-            with open("error.log", "r") as error_file:
-                error_message = error_file.read()
-            app.logger.debug(f"Read error message from error.log: {error_message}")
+        if "NameError: Variable" in error_message:
+            error_message = error_message.split("NameError: ")[1].split("\n")[0]
         return jsonify({'output': '', 'error': error_message})
+    except Exception as e:  # Catch any other exceptions
+        app.logger.error(f"Unhandled exception: {e}")
+        return jsonify({'output': '', 'error': str(e)})  # Return error to client
 
 def compile_pseudocode_to_python(pseudocode):
     psc_file = 'temp.psc'
@@ -46,7 +48,12 @@ def compile_pseudocode_to_python(pseudocode):
         file.write(pseudocode)
     
     # Run your existing compiler (main.py) to generate a Python file
-    subprocess.run(['python3', 'Compiler/main.py', psc_file, python_file], check=True)
+    try:
+        result = subprocess.run(['python3', 'Compiler/main.py', psc_file, python_file], capture_output=True, text=True, check=True)
+        if result.returncode != 0:
+            raise Exception(result.stderr)
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Compilation error: {e.stderr}")
     
     return python_file
 

@@ -1,6 +1,7 @@
-x <- 2
-FOR i <- 1 TO 5000 DO
-  x <- x + i
-  PRINT x
-ENDFOR
-
+x <- (3 + 2) * (7 - 4)
+READ x
+PROCEDURE square(n)
+  RETURN n * n
+ENDPROCEDURE
+x <- square(5)
+PRINT x
