@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = JSON.stringify({ pseudocode, input_data: inputData });
         
         try {
-            const response = await fetch('/compile', {
+            const response = await fetch('http://localhost:5000/compile', { // Use absolute URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -3,12 +3,16 @@ from flask_cors import CORS  # Add this line
 import subprocess
 import os
 import logging
+import sys
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 CORS(app)  # Enable CORS for all routes
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Determine python command
+python_cmd = "py" if os.name == "nt" else "python"
 
 @app.route('/')
 def index():
@@ -35,7 +39,7 @@ def compile_code():
         if not input_data.endswith("\n"):
             input_data += "\n"
         process = subprocess.Popen(
-            ['python3', python_file],
+            [python_cmd, "-u", python_file],  # Add "-u" flag for unbuffered mode
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -68,8 +72,13 @@ def compile_pseudocode_to_python(pseudocode):
     
     # Run your existing compiler (main.py) to generate a Python file
     try:
-        app.logger.debug(f"Running compiler: python3 Compiler/main.py {psc_file} {python_file}")
-        result = subprocess.run(['python3', 'Compiler/main.py', psc_file, python_file], capture_output=True, text=True, check=True)
+        app.logger.debug(f"Running compiler: {python_cmd} Compiler/main.py {psc_file} {python_file}")
+        result = subprocess.run(
+            [python_cmd, "-u", 'Compiler/main.py', psc_file, python_file],  # Use "-u" flag here too if needed
+            capture_output=True,
+            text=True,
+            check=True
+        )
         app.logger.debug(f"Compiler stdout: {result.stdout}")
         app.logger.debug(f"Compiler stderr: {result.stderr}")
         if result.returncode != 0:
